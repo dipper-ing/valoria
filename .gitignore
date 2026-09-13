@@ -6,3 +6,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.iml
+
+# Variables de entorno reales (nunca se suben)
+.env
