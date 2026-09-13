@@ -1,0 +1,127 @@
+<style>
+#erd svg.erDiagram .divider path { stroke-opacity: 0.5; }
+#erd svg.erDiagram .row-rect-odd path,
+#erd svg.erDiagram .row-rect-odd rect,
+#erd svg.erDiagram .row-rect-even path,
+#erd svg.erDiagram .row-rect-even rect { stroke: none !important; }
+</style>
+<div id="erd"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+const source = `erDiagram
+  USUARIO ||--|| PERSONAJE : tiene
+  CLASE_PERSONAJE ||--o{ PERSONAJE : clasifica
+  NIVEL ||--o{ PERSONAJE : define
+  PERSONAJE ||--o{ MISION : crea
+  PERSONAJE ||--o{ META : crea
+  MISION ||--o{ MISION_META : referenciada
+  META ||--o{ MISION_META : referenciada
+  PERSONAJE ||--o{ PERSONAJE_INSIGNIA : obtiene
+  INSIGNIA ||--o{ PERSONAJE_INSIGNIA : otorgada
+
+  USUARIO {
+    bigint id PK
+    varchar correo UK
+    varchar contrasena_hash
+    varchar proveedor_auth
+    varchar google_refresh_token
+    varchar rol
+  }
+  PERSONAJE {
+    bigint id PK
+    bigint usuario_id FK
+    varchar nombre
+    bigint clase_id FK "nuevo, antes era texto libre"
+    int nivel FK "ahora referencia a NIVEL"
+    int xp_actual
+    int oro
+    int racha_general_dias
+    date ultima_actividad_fecha
+    int pociones_disponibles "nuevo"
+  }
+  CLASE_PERSONAJE {
+    bigint id PK
+    varchar nombre
+    varchar descripcion
+  }
+  NIVEL {
+    int nivel PK
+    int xp_requerido
+  }
+  MISION {
+    bigint id PK
+    bigint personaje_id FK
+    varchar nombre
+    varchar frecuencia
+    varchar estado
+    int racha_dias
+    date ultima_completada_fecha
+    int xp_recompensa
+    int oro_recompensa
+    varchar google_event_id "nuevo"
+  }
+  META {
+    bigint id PK
+    bigint personaje_id FK
+    varchar nombre
+    text descripcion
+    int vida_total
+    int vida_actual
+    varchar estado
+  }
+  MISION_META {
+    bigint mision_id FK
+    bigint meta_id FK
+    int dano_por_completar
+  }
+  INSIGNIA {
+    bigint id PK
+    varchar nombre
+    varchar condicion
+  }
+  PERSONAJE_INSIGNIA {
+    bigint personaje_id FK
+    bigint insignia_id FK
+    timestamp fecha_obtencion
+  }`;
+const { svg } = await mermaid.render('erd-svg', source);
+document.getElementById('erd').innerHTML = svg;
+
+document.querySelectorAll('#erd svg.erDiagram .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+
+document.querySelectorAll('#erd svg.erDiagram .row-rect-odd path, #erd svg.erDiagram .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+</script>
