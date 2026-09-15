@@ -51,11 +51,17 @@ Owner, Frontend, Backend, Base de Datos, DevOps/Azure. Ningún rol es fijo de un
       diagrama de clases/paquetes del backend, contrato de API con 18 endpoints documentado
       en OpenAPI (`openapi.yaml` en la raíz del repo). Pendiente dentro de esta fase: wireframes
       visuales en Figma (el sistema de diseño conceptual ya está definido, ver sección 9).
-- [ ] **Fase 3 — Configuración técnica**: *siguiente paso*. Crear proyecto Spring Boot, proyecto
-      frontend React+Vite, PostgreSQL local, recursos en Azure, pipeline CI/CD, credenciales
-      OAuth2 de Google.
-- [ ] **Fase 4 — Backend**: entidades JPA, repositorios, servicios, controllers, JWT, login con
-      Google, documentación Swagger.
+- [~] **Fase 3 — Configuración técnica** (en progreso, avanzando en paralelo con Fase 4 — no es
+      estrictamente secuencial): [x] proyecto Spring Boot (`backend/`, Java 17 + Maven),
+      [x] PostgreSQL local vía Docker Compose. Pendiente: [ ] proyecto frontend React+Vite,
+      [ ] recursos en Azure, [ ] pipeline CI/CD, [ ] credenciales OAuth2 de Google. Se retoman
+      cuando el backend tenga algo real que exponer/desplegar, o cuando el segundo integrante
+      del equipo (GitHub: `Joselito17821`, invitado el 2026-09-15) se sume activamente.
+- [~] **Fase 4 — Backend** (en progreso): [x] primera entidad JPA (`Usuario` + enum `Role`,
+      tabla creada en Postgres vía `ddl-auto=update`). *Siguiente paso*: Repository + Service +
+      Controller de `Usuario` para HU-01 (registro con correo/contraseña, hasheada, sin JWT
+      todavía). JWT y login con Google se agregan en una iteración posterior, una vez el
+      registro básico funcione de punta a punta. Documentación Swagger, pendiente.
 - [ ] **Fase 5 — Frontend**: pantallas (login, hoja de personaje, misiones, mapa, perfil),
       conexión con la API, estética pixel-RPG.
 - [ ] **Fase 6 — Integraciones externas**: sincronización de misiones con Google Calendar.
