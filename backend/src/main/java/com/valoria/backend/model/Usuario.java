@@ -54,10 +54,10 @@ public class Usuario {
     }
 
     @Id
-    @GeneratedValue(strategy = generationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long id;
 
-    @Column(unique = true = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String correo;
 
     private String contrasenaHash;
