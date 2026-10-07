@@ -1,6 +1,7 @@
 package com.valoria.backend.service;
 
 import com.valoria.backend.dto.RegistroRequest;
+import com.valoria.backend.exception.CorreoYaRegistradoException;
 import com.valoria.backend.model.Role;
 import com.valoria.backend.model.Usuario;
 import com.valoria.backend.repository.UsuarioRepository;
@@ -19,7 +20,7 @@ public class AuthService {
 
     public Usuario registrar(RegistroRequest request) {
         if (usuarioRepository.findByCorreo(request.correo()).isPresent()) {
-            throw new IllegalArgumentException("El correo ya esta registrado");
+            throw new CorreoYaRegistradoException(request.correo());
         }
 
         Usuario usuario = new Usuario();

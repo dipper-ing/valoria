@@ -223,5 +223,29 @@ duras sin blur. Barra de vida/XP segmentada, no lisa.
 
 ## 14. Siguiente paso inmediato
 
-Arrancar la **Fase 3**: crear el proyecto Spring Boot, el proyecto frontend, configurar
-PostgreSQL local, y las cuentas de Azure y Google Cloud Console.
+Terminar HU-01 (registro con correo/contraseña): falta el `AuthController`
+(`POST /auth/registro`), correr la app y probar con Postman de punta a punta. JWT y login con
+Google quedan para después de que el registro básico funcione completo (ver Fase 4, sección 4).
+
+## 15. Troubleshooting (problemas ya resueltos, para no repetir el diagnóstico)
+
+**Error `FATAL: la autentificación password falló para el usuario "valoria"` al correr el
+backend, con Docker Compose ya levantado y el `.env` con los valores correctos.**
+
+Causa más común: **otro PostgreSQL corriendo en el puerto 5432 por fuera de Docker** (un
+PostgreSQL instalado nativo en Windows de otro proyecto) — el backend termina conectándose a
+ese Postgres nativo en vez de al contenedor `valoria-postgres`, y sus credenciales no coinciden.
+Pasó tanto con Juan José como con Joselito.
+
+Cómo diagnosticarlo y arreglarlo:
+1. Revisar "Servicios" de Windows por algo como `postgresql-x64-...` corriendo, y detenerlo
+   (o desinstalarlo si no se usa para nada más).
+2. Si el error persiste después de eso, verificar que no haya una variable de entorno real
+   `DB_USERNAME`/`DB_PASSWORD` en el sistema (`echo $env:DB_PASSWORD` en PowerShell) o en el
+   Run/Debug Configuration de IntelliJ (Edit Configurations → Environment variables) que esté
+   pisando el valor de respaldo de `application.properties`.
+3. Si se corrigió el `.env` **después** de que el contenedor ya se había creado una vez: no
+   basta con `docker compose up -d` de nuevo — Postgres solo aplica `POSTGRES_PASSWORD` la
+   primera vez que crea el volumen. Hay que forzar la recreación completa:
+   `docker compose down -v` (el `-v` sí borra el volumen, a diferencia del `down` normal) y
+   luego `docker compose up -d`.
