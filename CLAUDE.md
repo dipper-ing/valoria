@@ -51,11 +51,17 @@ Owner, Frontend, Backend, Base de Datos, DevOps/Azure. Ningún rol es fijo de un
       diagrama de clases/paquetes del backend, contrato de API con 18 endpoints documentado
       en OpenAPI (`openapi.yaml` en la raíz del repo). Pendiente dentro de esta fase: wireframes
       visuales en Figma (el sistema de diseño conceptual ya está definido, ver sección 9).
-- [ ] **Fase 3 — Configuración técnica**: *siguiente paso*. Crear proyecto Spring Boot, proyecto
-      frontend React+Vite, PostgreSQL local, recursos en Azure, pipeline CI/CD, credenciales
-      OAuth2 de Google.
-- [ ] **Fase 4 — Backend**: entidades JPA, repositorios, servicios, controllers, JWT, login con
-      Google, documentación Swagger.
+- [~] **Fase 3 — Configuración técnica** (en progreso, avanzando en paralelo con Fase 4 — no es
+      estrictamente secuencial): [x] proyecto Spring Boot (`backend/`, Java 17 + Maven),
+      [x] PostgreSQL local vía Docker Compose. Pendiente: [ ] proyecto frontend React+Vite,
+      [ ] recursos en Azure, [ ] pipeline CI/CD, [ ] credenciales OAuth2 de Google. Se retoman
+      cuando el backend tenga algo real que exponer/desplegar, o cuando el segundo integrante
+      del equipo (GitHub: `Joselito17821`, invitado el 2026-09-15) se sume activamente.
+- [~] **Fase 4 — Backend** (en progreso): [x] primera entidad JPA (`Usuario` + enum `Role`,
+      tabla creada en Postgres vía `ddl-auto=update`). *Siguiente paso*: Repository + Service +
+      Controller de `Usuario` para HU-01 (registro con correo/contraseña, hasheada, sin JWT
+      todavía). JWT y login con Google se agregan en una iteración posterior, una vez el
+      registro básico funcione de punta a punta. Documentación Swagger, pendiente.
 - [ ] **Fase 5 — Frontend**: pantallas (login, hoja de personaje, misiones, mapa, perfil),
       conexión con la API, estética pixel-RPG.
 - [ ] **Fase 6 — Integraciones externas**: sincronización de misiones con Google Calendar.
@@ -217,5 +223,29 @@ duras sin blur. Barra de vida/XP segmentada, no lisa.
 
 ## 14. Siguiente paso inmediato
 
-Arrancar la **Fase 3**: crear el proyecto Spring Boot, el proyecto frontend, configurar
-PostgreSQL local, y las cuentas de Azure y Google Cloud Console.
+Terminar HU-01 (registro con correo/contraseña): falta el `AuthController`
+(`POST /auth/registro`), correr la app y probar con Postman de punta a punta. JWT y login con
+Google quedan para después de que el registro básico funcione completo (ver Fase 4, sección 4).
+
+## 15. Troubleshooting (problemas ya resueltos, para no repetir el diagnóstico)
+
+**Error `FATAL: la autentificación password falló para el usuario "valoria"` al correr el
+backend, con Docker Compose ya levantado y el `.env` con los valores correctos.**
+
+Causa más común: **otro PostgreSQL corriendo en el puerto 5432 por fuera de Docker** (un
+PostgreSQL instalado nativo en Windows de otro proyecto) — el backend termina conectándose a
+ese Postgres nativo en vez de al contenedor `valoria-postgres`, y sus credenciales no coinciden.
+Pasó tanto con Juan José como con Joselito.
+
+Cómo diagnosticarlo y arreglarlo:
+1. Revisar "Servicios" de Windows por algo como `postgresql-x64-...` corriendo, y detenerlo
+   (o desinstalarlo si no se usa para nada más).
+2. Si el error persiste después de eso, verificar que no haya una variable de entorno real
+   `DB_USERNAME`/`DB_PASSWORD` en el sistema (`echo $env:DB_PASSWORD` en PowerShell) o en el
+   Run/Debug Configuration de IntelliJ (Edit Configurations → Environment variables) que esté
+   pisando el valor de respaldo de `application.properties`.
+3. Si se corrigió el `.env` **después** de que el contenedor ya se había creado una vez: no
+   basta con `docker compose up -d` de nuevo — Postgres solo aplica `POSTGRES_PASSWORD` la
+   primera vez que crea el volumen. Hay que forzar la recreación completa:
+   `docker compose down -v` (el `-v` sí borra el volumen, a diferencia del `down` normal) y
+   luego `docker compose up -d`.
