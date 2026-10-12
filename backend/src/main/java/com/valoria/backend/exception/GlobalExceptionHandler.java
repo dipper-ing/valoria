@@ -29,4 +29,9 @@ public class GlobalExceptionHandler {
         ErrorResponse cuerpo = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Datos invalidos", errores);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(cuerpo);
     }
+    @ExceptionHandler(CredencialesInvalidasException.class)
+    public ResponseEntity<ErrorResponse> manejarCredencialesInvalidas(CredencialesInvalidasException ex) {
+        ErrorResponse cuerpo = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), Map.of());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(cuerpo);
+    }
 }
