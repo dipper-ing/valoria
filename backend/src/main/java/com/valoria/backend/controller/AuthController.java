@@ -1,8 +1,8 @@
 package com.valoria.backend.controller;
 
+import com.valoria.backend.dto.AuthResponse;
+import com.valoria.backend.dto.LoginRequest;
 import com.valoria.backend.dto.RegistroRequest;
-import com.valoria.backend.dto.UsuarioResponse;
-import com.valoria.backend.model.Usuario;
 import com.valoria.backend.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,8 +23,12 @@ public class AuthController {
     }
 
     @PostMapping("/registro")
-    public ResponseEntity<UsuarioResponse> registro(@Valid @RequestBody RegistroRequest request) {
-        Usuario usuario = authService.registrar(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioResponse.desde(usuario));
+    public ResponseEntity<AuthResponse> registro(@Valid @RequestBody RegistroRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.registrar(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.autenticar(request));
     }
 }

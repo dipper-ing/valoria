@@ -57,11 +57,12 @@ Owner, Frontend, Backend, Base de Datos, DevOps/Azure. Ningún rol es fijo de un
       [ ] recursos en Azure, [ ] pipeline CI/CD, [ ] credenciales OAuth2 de Google. Se retoman
       cuando el backend tenga algo real que exponer/desplegar, o cuando el segundo integrante
       del equipo (GitHub: `Joselito17821`, invitado el 2026-09-15) se sume activamente.
-- [~] **Fase 4 — Backend** (en progreso): [x] primera entidad JPA (`Usuario` + enum `Role`,
-      tabla creada en Postgres vía `ddl-auto=update`). *Siguiente paso*: Repository + Service +
-      Controller de `Usuario` para HU-01 (registro con correo/contraseña, hasheada, sin JWT
-      todavía). JWT y login con Google se agregan en una iteración posterior, una vez el
-      registro básico funcione de punta a punta. Documentación Swagger, pendiente.
+- [~] **Fase 4 — Backend** (en progreso): [x] entidad JPA `Usuario` + enum `Role` (tabla creada
+      vía `ddl-auto=update`), [x] `POST /auth/registro` funcionando de punta a punta y probado en
+      Postman (Controller → Service → Repository, BCrypt, DTOs de entrada/salida, manejo global
+      de errores 400/409), SIN JWT todavía. *Siguiente paso*: Spring Security + JWT + login
+      (HU-02) + que el registro devuelva el token (cierra HU-01). Login con Google y
+      documentación Swagger, pendientes.
 - [ ] **Fase 5 — Frontend**: pantallas (login, hoja de personaje, misiones, mapa, perfil),
       conexión con la API, estética pixel-RPG.
 - [ ] **Fase 6 — Integraciones externas**: sincronización de misiones con Google Calendar.
@@ -223,9 +224,10 @@ duras sin blur. Barra de vida/XP segmentada, no lisa.
 
 ## 14. Siguiente paso inmediato
 
-Terminar HU-01 (registro con correo/contraseña): falta el `AuthController`
-(`POST /auth/registro`), correr la app y probar con Postman de punta a punta. JWT y login con
-Google quedan para después de que el registro básico funcione completo (ver Fase 4, sección 4).
+Spring Security + JWT: agregar el starter de Security (cuidado: bloquea todos los endpoints por
+defecto, hay que configurar un `SecurityFilterChain` que deje públicos `/auth/**`), `JwtService`
+(generar/validar tokens, secreto por variable de entorno), login (HU-02) y que el registro
+devuelva el token (cierra HU-01). Login con Google queda para después.
 
 ## 15. Troubleshooting (problemas ya resueltos, para no repetir el diagnóstico)
 
