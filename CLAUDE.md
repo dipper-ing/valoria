@@ -60,9 +60,13 @@ Owner, Frontend, Backend, Base de Datos, DevOps/Azure. Ningún rol es fijo de un
 - [~] **Fase 4 — Backend** (en progreso): [x] entidad JPA `Usuario` + enum `Role` (tabla creada
       vía `ddl-auto=update`), [x] `POST /auth/registro` funcionando de punta a punta y probado en
       Postman (Controller → Service → Repository, BCrypt, DTOs de entrada/salida, manejo global
-      de errores 400/409), SIN JWT todavía. *Siguiente paso*: Spring Security + JWT + login
-      (HU-02) + que el registro devuelva el token (cierra HU-01). Login con Google y
-      documentación Swagger, pendientes.
+      de errores 400/409), [x] Spring Security + `JwtService` (jjwt 0.13.0) + `POST /auth/login`
+      + registro que devuelve token: **HU-01 y HU-02 completas** (PR #6), [x] filtro JWT
+      (`JwtAuthenticationFilter` + `UsuarioDetailsService`), 401 sin token (`AuthenticationEntryPoint`)
+      y `POST /auth/logout` (HU-03) como primer endpoint protegido, [x] CORS (PR #7, Joselito).
+      *Siguiente paso*: entidad `Personaje` (+ catálogo `CLASE_PERSONAJE`) y endpoints
+      `POST /personajes` y `GET /personajes/me` (HU-05, HU-07). Login con Google y documentación
+      Swagger, pendientes.
 - [ ] **Fase 5 — Frontend**: pantallas (login, hoja de personaje, misiones, mapa, perfil),
       conexión con la API, estética pixel-RPG.
 - [ ] **Fase 6 — Integraciones externas**: sincronización de misiones con Google Calendar.
@@ -224,10 +228,12 @@ duras sin blur. Barra de vida/XP segmentada, no lisa.
 
 ## 14. Siguiente paso inmediato
 
-Spring Security + JWT: agregar el starter de Security (cuidado: bloquea todos los endpoints por
-defecto, hay que configurar un `SecurityFilterChain` que deje públicos `/auth/**`), `JwtService`
-(generar/validar tokens, secreto por variable de entorno), login (HU-02) y que el registro
-devuelva el token (cierra HU-01). Login con Google queda para después.
+Personaje (EP-02, HU-05 y HU-07): entidad `Personaje` (1:1 con `Usuario`, ver
+`docs/modelo-datos.md`) con el catálogo `CLASE_PERSONAJE` (Guerrero/Mago/Clérigo/Pícaro) como
+tabla propia, `POST /personajes` (nombre + clase, nivel 1 con 0 XP) y `GET /personajes/me`. El
+usuario sale del token (`SecurityContext`), nunca del body. Pendientes menores: apagar
+`spring.jpa.open-in-view`, y en Azure definir la variable `JWT_SECRET` real (el valor por
+defecto es solo para desarrollo local). Login con Google queda para después.
 
 ## 15. Troubleshooting (problemas ya resueltos, para no repetir el diagnóstico)
 
